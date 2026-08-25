@@ -1,0 +1,7 @@
+# Base (CLI + Agent Core)
+requests>=2.31.0
+rich>=13.7.0
+
+# Interface Web (`python pudim.py --web`)
+fastapi>=0.110.0
+uvicorn>=0.29.0

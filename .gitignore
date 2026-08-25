@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Estado local do PudimAI (memória, sessões, logs por workspace)
+.pudimai/
+logs/
+*.log
+
+# Segredos / ambiente
+.env
+.env.*
+*.pem
+*.key
+
+# Ferramentas de dev
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+node_modules/
+
+# Editores / SO
+.idea/
+.vscode/
+.DS_Store

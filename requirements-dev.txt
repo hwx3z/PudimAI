@@ -1,0 +1,12 @@
+# Dependências de desenvolvimento/testes do PudimAI.
+# Instale com:  pip install -r requirements-dev.txt
+
+# Necessário para fastapi.testclient (starlette >= 1.0 usa httpx2;
+# em versões antigas do starlette o pacote é `httpx`).
+httpx2>=2.0
+
+# Qualidade de código
+ruff>=0.6
+
+# Testes (opcional: a suíte também roda com unittest puro)
+pytest>=8.0

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PudimAI — Local AI Software Engineering Platform</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍮</text></svg>" />
+</head>
+<body>
+  <!-- Tela de login / criar conta -->
+  <div id="auth-screen" class="auth-backdrop" hidden>
+    <div class="auth-card">
+      <div class="auth-brand">PudimAI<span class="dot-accent">.</span></div>
+      <p class="auth-sub">plataforma local de engenharia com IA</p>
+
+      <div class="auth-tabs" role="tablist">
+        <button type="button" id="tab-login" class="active">Entrar</button>
+        <button type="button" id="tab-register">Criar conta</button>
+      </div>
+
+      <form id="auth-form" autocomplete="on">
+        <label>Usuário
+          <input id="auth-user" minlength="3" maxlength="40"
+                 autocomplete="username" required />
+        </label>
+        <label>Senha
+          <input id="auth-pass" type="password" minlength="6"
+                 autocomplete="current-password" required />
+        </label>
+        <button id="auth-submit" class="btn-primary btn-block"
+                type="submit">Entrar</button>
+        <div id="auth-error" class="auth-error" role="alert"></div>
+      </form>
+
+      <p class="auth-foot">100% local · seus dados não saem desta máquina</p>
+    </div>
+  </div>
+
+  <div id="app">
+    <aside id="sidebar">
+      <div class="brand">
+        <span class="brand-mark">Pudim<b>AI</b></span>
+        <span class="brand-sub">local agent platform</span>
+      </div>
+
+      <button id="new-chat" class="btn-primary" title="Nova conversa (Ctrl+J)">+ Nova conversa</button>
+
+      <nav id="chat-list" aria-label="Conversas"></nav>
+
+      <div class="sidebar-footer">
+        <div class="ws-card">
+          <div class="ws-label">Workspace</div>
+          <div class="ws-path" id="ws-path">—</div>
+          <div class="ws-stack" id="ws-stack"></div>
+          <div class="ws-user-line">
+            <span id="whoami" class="chip">—</span>
+            <button id="logout-btn" class="link-ghost" title="Encerrar sessão">sair</button>
+          </div>
+        </div>
+        <div class="conn-line">
+          <span class="dot" id="status-dot"></span>
+          <select id="model-select" title="Modelo"></select>
+        </div>
+      </div>
+    </aside>
+
+    <main id="main">
+      <header id="topbar">
+        <div class="crumb" id="chat-title">PudimAI</div>
+        <div class="badges">
+          <span class="badge" id="security-badge">—</span>
+          <span class="badge subtle" id="agent-state">idle</span>
+        </div>
+      </header>
+
+      <nav id="view-tabs" role="tablist">
+        <button data-view="chat" class="active">Conversa</button>
+        <button data-view="computer">Computador da IA</button>
+      </nav>
+
+      <div id="view-chat">
+        <section id="messages" aria-live="polite"></section>
+
+        <footer id="composer-wrap">
+          <div id="activity" hidden>
+            <div class="act-head">
+              <span class="spinner"></span><span>Agente trabalhando…</span>
+              <button id="stop-btn" class="btn-danger-mini">parar</button>
+            </div>
+            <ul id="activity-list"></ul>
+          </div>
+          <div class="composer">
+            <textarea id="input" rows="1"
+              placeholder="Peça algo ao PudimAI…  (Enter envia · Shift+Enter quebra linha)"></textarea>
+            <button id="send-btn" class="btn-primary" title="Enviar">➤</button>
+          </div>
+        </footer>
+      </div>
+
+      <!-- Computador da IA: explorer + editor + terminal -->
+      <div id="view-computer" hidden>
+        <div id="ide">
+          <aside id="explorer">
+            <div class="ex-head">
+              <span>Arquivos</span>
+              <button id="tree-refresh" class="link-ghost"
+                      title="Recarregar árvore">recarregar</button>
+            </div>
+            <div id="tree"></div>
+          </aside>
+
+          <section id="ide-main">
+            <div id="editor-pane">
+              <div class="ed-head">
+                <span id="editor-path">nenhum arquivo aberto</span>
+                <span id="dirty-mark" hidden title="alterações não salvas">●</span>
+                <button id="save-btn" class="btn-primary btn-mini"
+                        disabled>Salvar (Ctrl+S)</button>
+              </div>
+              <textarea id="editor" spellcheck="false" disabled
+                placeholder="Abra um arquivo no explorador à esquerda…"></textarea>
+            </div>
+
+            <div id="term-pane">
+              <div class="term-head">
+                <span class="dot ok"></span>
+                <span>terminal · mesmo ambiente do agente</span>
+                <button id="term-clear" class="link-ghost">limpar</button>
+              </div>
+              <pre id="term-out"></pre>
+              <div class="term-input-row">
+                <span class="term-prompt">$</span>
+                <input id="term-in" autocomplete="off" spellcheck="false"
+                  placeholder="comando… Enter envia · ↑↓ histórico" />
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Menu de contexto das conversas -->
+  <div id="ctx-menu" class="ctx-menu" hidden>
+    <button data-action="rename" title="Renomear conversa">Renomear</button>
+    <button data-action="delete" class="danger" title="Excluir conversa">Excluir</button>
+  </div>
+
+  <!-- Modal de permissão ASK -->
+  <div id="perm-modal" class="modal-backdrop" hidden>
+    <div class="modal">
+      <h3>Permissão necessária</h3>
+      <p class="muted" id="perm-reason">—</p>
+      <pre class="cmd-box" id="perm-command"></pre>
+      <div class="modal-actions">
+        <button id="perm-deny" class="btn-ghost">Negar</button>
+        <button id="perm-allow" class="btn-primary">Permitir execução</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal genérico de confirmação -->
+  <div id="confirm-modal" class="modal-backdrop" hidden>
+    <div class="modal modal-small">
+      <h3 id="confirm-title">Confirmar</h3>
+      <p class="muted" id="confirm-msg">—</p>
+      <div class="modal-actions">
+        <button id="confirm-cancel" class="btn-ghost">Cancelar</button>
+        <button id="confirm-ok" class="btn-primary">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" hidden></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
